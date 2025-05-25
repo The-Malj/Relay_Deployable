@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Relay UI</title>
+  <style>
+    body { font-family: monospace; margin: 0; background: #111; color: #eee; }
+    .panel { padding: 1rem; border-bottom: 1px solid #333; }
+    .log, .code, .json { white-space: pre-wrap; background: #222; padding: 1rem; border-radius: 5px; max-height: 300px; overflow-y: auto; }
+    h2 { color: #4ef; margin-bottom: 0.5rem; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h2>Relay Log</h2>
+    <div id="log" class="log">Loading...</div>
+  </div>
+
+  <div class="panel">
+    <h2>Test Results (results.json)</h2>
+    <div id="results" class="json">Loading...</div>
+  </div>
+
+  <div class="panel">
+    <h2>core_src_lib.rs</h2>
+    <div id="core" class="code">Loading...</div>
+  </div>
+
+  <div class="panel">
+    <h2>parse_pdf.rs</h2>
+    <div id="parse" class="code">Loading...</div>
+  </div>
+
+  <script>
+    async function fetchText(type, target) {
+      try {
+        const res = await fetch(`/api/file/${type}`);
+        const text = await res.text();
+        document.getElementById(target).textContent = text;
+      } catch {
+        document.getElementById(target).textContent = "Failed to load.";
+      }
+    }
+
+    function refreshAll() {
+      fetchText('log', 'log');
+      fetchText('results', 'results');
+      fetchText('core', 'core');
+      fetchText('parse', 'parse');
+    }
+
+    refreshAll();
+    setInterval(refreshAll, 5000); // auto-refresh every 5 seconds
+  </script>
+</body>
+</html>

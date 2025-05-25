@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Relay UI</title>
+  <style>
+    body { font-family: monospace; margin: 0; background: #111; color: #eee; }
+    .panel { padding: 1rem; border-bottom: 1px solid #333; }
+    .log, .code, .json { white-space: pre-wrap; background: #222; padding: 1rem; border-radius: 5px; max-height: 300px; overflow-y: auto; }
+    h2 { color: #4ef; margin-bottom: 0.5rem; }
+    .url-box { background: #222; padding: 1rem; display: flex; align-items: center; justify-content: space-between; border-radius: 5px; margin: 1rem; }
+    button { padding: 0.5rem 1rem; background: #4ef; color: black; border: none; cursor: pointer; border-radius: 3px; }
+    button:hover { background: #2ac; }
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h2>Public ngrok URL</h2>
+    <div class="url-box">
+      <span id="ngrok-url">Loading...</span>
+      <button onclick="copyURL()">Copy</button>
+    </div>
+  </div>
+
+  <script>
+    async function fetchNgrokURL() {
+      try {
+        const res = await fetch('http://localhost:4040/api/tunnels');
+        const json = await res.json();
+        const url = json.tunnels?.[0]?.public_url || 'Unavailable';
+        document.getElementById('ngrok-url').textContent = url;
+        return url;
+      } catch {
+        document.getElementById('ngrok-url').textContent = 'Unavailable';
+        return 'Unavailable';
+      }
+    }
+
+    async function copyURL() {
+      const url = await fetchNgrokURL();
+      navigator.clipboard.writeText(url);
+      alert('Copied: ' + url);
+    }
+
+    fetchNgrokURL();
+    setInterval(fetchNgrokURL, 5000);
+  </script>
+</body>
+</html>
